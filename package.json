@@ -1,0 +1,18 @@
+{
+  "name": "rwa-auction-platform",
+  "version": "1.0.0",
+  "description": "Decentralized Auction Platform for Real-World Assets",
+  "private": true,
+  "scripts": {
+    "install:all": "cd contracts && npm install && cd ../frontend && npm install",
+    "compile": "cd contracts && npx hardhat compile",
+    "test": "cd contracts && npx hardhat test",
+    "coverage": "cd contracts && npx hardhat coverage",
+    "node": "cd contracts && npx hardhat node",
+    "deploy:local": "cd contracts && npx hardhat run scripts/deploy.js --network localhost",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down"
+  }
+}
