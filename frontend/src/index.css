@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Premium Luxury Dark Palette - Obsidian & Gold/Champagne */
+  --color-bg-primary: #050506;
+  --color-bg-secondary: #0b0b0d;
+  --color-bg-elevated: #111114;
+  --color-bg-surface: #17171b;
+
+  --color-text-primary: #faf9f6; /* Warm alabaster white */
+  --color-text-secondary: #a3a29e; /* Muted warm gray */
+  --color-text-muted: #666562;
+
+  --color-brand: #c5a880; /* Champagne Gold */
+  --color-brand-hover: #d4c4ae; /* Light Gold */
+  --color-brand-light: #e5dac9;
+  --color-brand-subtle: rgba(197, 168, 128, 0.08);
+
+  --color-accent: #8b7355; /* Bronze accent */
+  --color-accent-hover: #a68c6d;
+  
+  --color-gold: #c5a880;
+  --color-gold-hover: #d4c4ae;
+
+  --color-success: #2e7d32; /* Soft Forest Green */
+  --color-error: #c62828; /* Deep Muted Red */
+  --color-warning: #ef6c00; /* Amber Orange */
+
+  --color-border-subtle: rgba(255, 255, 255, 0.04);
+  --color-border-default: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.15);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --shadow-glow: 0 0 30px rgba(197, 168, 128, 0.08);
+  --shadow-glow-lg: 0 0 50px rgba(197, 168, 128, 0.12);
+}
+
+/* Custom Base Styles */
+@layer base {
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-brand);
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand-hover);
+  }
+
+  ::selection {
+    background: rgba(197, 168, 128, 0.2);
+    color: #ffffff;
+  }
+}
+
+/* Glassmorphism Components */
+@utility glass {
+  background: rgba(11, 11, 13, 0.5);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+@utility glass-card {
+  background: rgba(11, 11, 13, 0.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@utility glass-card-hover {
+  border-color: rgba(197, 168, 128, 0.2);
+  box-shadow: 0 16px 48px rgba(197, 168, 128, 0.05);
+}
+
+@utility glass-input {
+  background: rgba(7, 7, 8, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  outline: none;
+  transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@utility glass-input-focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(197, 168, 128, 0.15);
+}
+
+/* Custom Animation Utils */
+@utility perspective-1000 {
+  perspective: 1000px;
+}

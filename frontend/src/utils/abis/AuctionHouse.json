@@ -1,0 +1,17 @@
+[
+  "function createEnglishAuction(address _nftContract, uint256 _tokenId, uint256 _startingBid, uint256 _duration) external",
+  "function createDutchAuction(address _nftContract, uint256 _tokenId, uint256 _startPrice, uint256 _endPrice, uint256 _duration) external",
+  "function placeBid(uint256 _auctionId) external payable",
+  "function finalizeAuction(uint256 _auctionId) external",
+  "function buyFromDutchAuction(uint256 _auctionId) external payable",
+  "function getCurrentPrice(uint256 _auctionId) public view returns (uint256)",
+  "function getAuction(uint256 _auctionId) external view returns (tuple(uint256 auctionId, uint8 auctionType, uint8 status, address seller, address nftContract, uint256 tokenId, uint256 startTime, uint256 endTime, uint256 startingPrice, uint256 endPrice, address highestBidder, uint256 highestBid))",
+  "function getActiveAuctions() external view returns (uint256[])",
+  "function cancelAuction(uint256 _auctionId) external",
+  "function auctionCount() public view returns (uint256)",
+  "event AuctionCreated(uint256 indexed auctionId, address indexed seller, address nftContract, uint256 tokenId, uint8 auctionType, uint256 startingPrice, uint256 endTime)",
+  "event BidPlaced(uint256 indexed auctionId, address indexed bidder, uint256 amount)",
+  "event RefundSent(address indexed bidder, uint256 amount)",
+  "event AuctionFinalized(uint256 indexed auctionId, address indexed winner, uint256 amount)",
+  "event AuctionCancelled(uint256 indexed auctionId)"
+]
