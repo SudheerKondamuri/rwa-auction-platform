@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  hardhat-node:
+    build:
+      context: ./contracts
+      dockerfile: Dockerfile
+    ports:
+      - "8545:8545"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8545 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+    networks:
+      - rwa-network
+
+  deploy-contracts:
+    build:
+      context: ./contracts
+      dockerfile: Dockerfile
+    command: ["sh", "-c", "sleep 5 && npx hardhat run scripts/deploy.js --network docker"]
+    environment:
+      - HARDHAT_NETWORK=docker
+    depends_on:
+      hardhat-node:
+        condition: service_healthy
+    networks:
+      - rwa-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_RPC_URL=http://localhost:8545
+      - VITE_RWA_TOKEN_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
+      - VITE_AUCTION_HOUSE_ADDRESS=0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+    depends_on:
+      hardhat-node:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5173 -T 2 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 15s
+    networks:
+      - rwa-network
+
+networks:
+  rwa-network:
+    driver: bridge
