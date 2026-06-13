@@ -17,6 +17,11 @@ export const useWalletStore = create((set, get) => ({
     set({ isConnecting: true, error: null });
     try {
       const provider = new BrowserProvider(window.ethereum);
+      // Force MetaMask account selection dialog by requesting permissions
+      await window.ethereum.request({
+        method: 'wallet_requestPermissions',
+        params: [{ eth_accounts: {} }],
+      });
       const accounts = await provider.send('eth_requestAccounts', []);
       const signer = await provider.getSigner();
       const network = await provider.getNetwork();
