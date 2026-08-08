@@ -70,4 +70,56 @@ export function generateGradient(tokenId) {
   const [color1, color2] = palettes[id % palettes.length];
   return `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
 }
+export function formatErrorMessage(error) {
+  if (!error) return 'Transaction failed. Please try again.';
+  
+  // Handle string errors
+  if (typeof error === 'string') {
+    if (error.includes('insufficient funds')) {
+      return 'Insufficient ETH balance in your wallet for value + gas fees.';
+    }
+    if (error.includes('user rejected') || error.includes('User denied')) {
+      return 'Transaction cancelled by user.';
+    }
+    return error.split('(transaction=')[0].split('(action=')[0].trim();
+  }
 
+  // Handle Ethers.js error codes
+  if (error.code === 'INSUFFICIENT_FUNDS' || (error.message && error.message.includes('insufficient funds'))) {
+    return 'Insufficient ETH balance in your wallet to cover the asset price and gas fees.';
+  }
+
+  if (error.code === 'ACTION_REJECTED' || (error.message && (error.message.includes('user rejected') || error.message.includes('User denied')))) {
+    return 'Transaction cancelled by user.';
+  }
+
+  // Extract explicit contract revert reason
+  if (error.reason) {
+    return `Transaction reverted: ${error.reason}`;
+  }
+
+  if (error.shortMessage) {
+    return error.shortMessage;
+  }
+
+  if (error.info?.error?.message) {
+    const msg = error.info.error.message;
+    if (msg.includes('insufficient funds')) {
+      return 'Insufficient ETH balance in your wallet to cover the asset price and gas fees.';
+    }
+    if (msg.includes('execution reverted:')) {
+      return `Contract reverted: ${msg.split('execution reverted:')[1].trim()}`;
+    }
+    return msg;
+  }
+
+  if (error.message) {
+    let clean = error.message.split('(transaction=')[0].split('(action=')[0].split('(code=')[0].trim();
+    if (clean.includes('insufficient funds')) {
+      return 'Insufficient ETH balance in wallet for value + gas.';
+    }
+    return clean || 'Transaction failed. Please check network and wallet status.';
+  }
+
+  return 'Transaction failed. Please try again.';
+}
