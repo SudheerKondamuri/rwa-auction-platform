@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuctionStore } from '../stores/auctionStore';
 import { useWalletStore } from '../stores/walletStore';
+import { useNFTStore } from '../stores/nftStore';
 import { formatEth, truncateAddress, formatDate, generateGradient, formatErrorMessage } from '../utils/formatters';
 import CountdownTimer from '../components/CountdownTimer';
 import BidPanel from '../components/BidPanel';
@@ -43,6 +44,7 @@ export default function AuctionDetail() {
     try {
       await finalizeAuction(signer, Number(id));
       toast.success('Auction finalized!');
+      if (account) useNFTStore.getState().fetchMyNFTs(account);
     } catch (error) {
       toast.error(formatErrorMessage(error));
     } finally {
@@ -186,6 +188,42 @@ export default function AuctionDetail() {
           {/* Active Action Panel */}
           {isActive && isEnglish && !hasEnded && <BidPanel auction={auction} />}
           {isActive && !isEnglish && !hasEnded && <DutchBuyPanel auction={auction} />}
+
+          {/* Finalized / Purchased Card */}
+          {auction.status === 1 && (
+            <div className="glass-card p-6 border border-success/30 bg-success/10 flex flex-col gap-4 text-left">
+              <div className="flex items-center gap-3 text-success">
+                <CheckCircle2 className="w-6 h-6 flex-shrink-0" />
+                <div>
+                  <h4 className="font-heading font-bold text-base text-white">Auction Finalized & Asset Settled</h4>
+                  <p className="text-xs text-text-secondary mt-0.5">
+                    {isEnglish 
+                      ? (auction.highestBidder !== '0x0000000000000000000000000000000000000000'
+                          ? `Won by ${truncateAddress(auction.highestBidder)} for ${formatEth(auction.highestBid)}.`
+                          : 'Auction ended with no bids. Token returned to seller.')
+                      : `Asset successfully purchased in Dutch Auction.`}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate('/my-nfts')}
+                className="w-full py-3 bg-gradient-to-r from-brand to-brand-hover hover:from-brand-hover hover:to-brand-light rounded-xl font-bold text-xs text-white shadow-glow transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>View Asset in My Collection</span>
+              </button>
+            </div>
+          )}
+
+          {/* Cancelled Card */}
+          {auction.status === 2 && (
+            <div className="glass-card p-6 border border-white/10 bg-white/5 flex items-center gap-3 text-left text-text-muted">
+              <ShieldAlert className="w-5 h-5 flex-shrink-0" />
+              <div>
+                <h4 className="font-heading font-bold text-sm text-white">Auction Cancelled</h4>
+                <p className="text-xs text-text-secondary mt-0.5">This auction was cancelled by the seller.</p>
+              </div>
+            </div>
+          )}
 
           {canFinalize && (
             <button
