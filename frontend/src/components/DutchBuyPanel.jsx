@@ -5,21 +5,28 @@ import { useWalletStore } from '../stores/walletStore';
 import { useAuctionStore } from '../stores/auctionStore';
 import { CONTRACT_ADDRESSES, RPC_URL } from '../utils/contractAddresses';
 import AuctionHouseABI from '../utils/abis/AuctionHouse.json';
-import { formatEth } from '../utils/formatters';
-import { ShoppingBag, TrendingDown } from 'lucide-react';
+import { formatEth, formatErrorMessage } from '../utils/formatters';
+import { ShoppingBag, TrendingDown, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function DutchBuyPanel({ auction }) {
   const [currentPrice, setCurrentPrice] = useState(null);
+  const [userBalance, setUserBalance] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { signer, account } = useWalletStore();
+  const { signer, account, provider } = useWalletStore();
   const { buyFromDutchAuction } = useAuctionStore();
+
+  useEffect(() => {
+    if (account && provider) {
+      provider.getBalance(account).then(setUserBalance).catch(() => {});
+    }
+  }, [account, provider]);
 
   useEffect(() => {
     const fetchPrice = async () => {
       try {
-        const provider = new JsonRpcProvider(RPC_URL);
-        const contract = new Contract(CONTRACT_ADDRESSES.AUCTION_HOUSE, AuctionHouseABI, provider);
+        const prov = provider || new JsonRpcProvider(RPC_URL);
+        const contract = new Contract(CONTRACT_ADDRESSES.AUCTION_HOUSE, AuctionHouseABI, prov);
         const price = await contract.getCurrentPrice(auction.auctionId);
         setCurrentPrice(price);
       } catch (err) {
@@ -29,15 +36,21 @@ export default function DutchBuyPanel({ auction }) {
     fetchPrice();
     const interval = setInterval(fetchPrice, 5000);
     return () => clearInterval(interval);
-  }, [auction.auctionId]);
+  }, [auction.auctionId, provider]);
 
   const totalDuration = Number(auction.endTime - auction.startTime);
   const elapsed = Math.floor(Date.now() / 1000) - Number(auction.startTime);
   const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
 
+  const hasInsufficientFunds = userBalance !== null && currentPrice !== null && userBalance < currentPrice;
+
   const handleBuy = async () => {
     if (!signer || !account) {
       toast.error('Please connect your wallet');
+      return;
+    }
+    if (hasInsufficientFunds) {
+      toast.error(`Insufficient ETH balance (${formatEth(userBalance)} available, ${formatEth(currentPrice)} required)`);
       return;
     }
     setLoading(true);
@@ -47,8 +60,7 @@ export default function DutchBuyPanel({ auction }) {
       await buyFromDutchAuction(signer, auction.auctionId, bufferPrice);
       toast.success('Purchase successful!');
     } catch (error) {
-      const msg = error?.reason || error?.message || 'Transaction failed';
-      toast.error(msg);
+      toast.error(formatErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -85,7 +97,7 @@ export default function DutchBuyPanel({ auction }) {
 
       <button
         onClick={handleBuy}
-        disabled={loading || !account}
+        disabled={loading || !account || hasInsufficientFunds}
         className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-accent to-accent-hover hover:from-accent-hover hover:to-brand rounded-xl font-bold text-sm text-white shadow-glow disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all duration-200"
       >
         {loading ? (
@@ -95,6 +107,13 @@ export default function DutchBuyPanel({ auction }) {
         )}
         <span>{loading ? 'Processing...' : 'Buy Now'}</span>
       </button>
+
+      {hasInsufficientFunds && (
+        <div className="flex items-center gap-2 text-warning bg-warning/10 border border-warning/20 p-3 rounded-xl text-xs font-medium text-left">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span>Insufficient funds ({formatEth(userBalance)} available, {formatEth(currentPrice)} needed). Please switch to a funded Hardhat account in MetaMask.</span>
+        </div>
+      )}
     </div>
   );
 }
