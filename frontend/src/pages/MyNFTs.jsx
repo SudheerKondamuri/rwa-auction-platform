@@ -1,17 +1,6 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useWalletStore } from '../stores/walletStore';
-import { useNFTStore } from '../stores/nftStore';
-import { generateGradient } from '../utils/formatters';
-import { Lock, FolderHeart, PlusCircle, Gavel, Building2, Home, Landmark, Gem, Paintbrush } from 'lucide-react';
+import AssetVisual from '../components/AssetVisual';
+import { Lock, FolderHeart, PlusCircle, Gavel } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-function NFTIcon({ tokenId, className = "w-12 h-12 text-white" }) {
-  const id = Number(tokenId);
-  const icons = [Building2, Home, Landmark, Gem, Paintbrush];
-  const IconComponent = icons[id % icons.length];
-  return <IconComponent className={className} />;
-}
 
 export default function MyNFTs() {
   const { account } = useWalletStore();
@@ -94,16 +83,8 @@ export default function MyNFTs() {
               transition={{ delay: i * 0.05 }}
               className="glass-card hover:glass-card-hover overflow-hidden flex flex-col group h-full text-left"
             >
-              <div
-                className="h-[180px] w-full flex items-center justify-center relative overflow-hidden transition-transform duration-500 group-hover:scale-[1.02]"
-                style={{ background: generateGradient(nft.tokenId) }}
-              >
-                <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
-                <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-                
-                <div className="w-20 h-20 rounded-3xl bg-black/20 backdrop-blur-md flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <NFTIcon tokenId={nft.tokenId} />
-                </div>
+              <div className="h-[200px] w-full relative overflow-hidden">
+                <AssetVisual tokenId={nft.tokenId} tokenURI={nft.tokenURI} className="w-full h-full" />
               </div>
 
               <div className="p-6 flex flex-col flex-1 gap-6">
