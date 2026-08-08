@@ -5,7 +5,7 @@ import { CONTRACT_ADDRESSES, RPC_URL } from '../utils/contractAddresses';
 import RWATokenABI from '../utils/abis/RWAToken.json';
 import { useWalletStore } from '../stores/walletStore';
 import { useNFTStore } from '../stores/nftStore';
-import { generateGradient } from '../utils/formatters';
+import { generateGradient, formatErrorMessage } from '../utils/formatters';
 import { Building2, Home, Landmark, Gem, Paintbrush, PlusCircle, AlertTriangle, Eye, ShieldAlert, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -62,7 +62,7 @@ export default function MintPage() {
       setForm({ name: '', description: '', imageUrl: '', category: 'real-estate' });
       fetchMyNFTs(account);
     } catch (error) {
-      toast.error(error?.reason || error?.message || 'Mint failed');
+      toast.error(formatErrorMessage(error));
     } finally {
       setLoading(false);
     }
