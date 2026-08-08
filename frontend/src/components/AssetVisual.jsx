@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Contract, JsonRpcProvider } from 'ethers';
-import { parseTokenURI, generateGradient } from '../utils/formatters';
+import { parseTokenURI, resolveIPFS, generateGradient } from '../utils/formatters';
 import { CONTRACT_ADDRESSES, RPC_URL } from '../utils/contractAddresses';
 import RWATokenABI from '../utils/abis/RWAToken.json';
 import { Building2, Home, Landmark, Gem, Paintbrush } from 'lucide-react';
@@ -22,32 +22,41 @@ export default function AssetVisual({ tokenId, tokenURI: initialURI, className =
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    if (initialURI) {
-      const parsed = parseTokenURI(initialURI);
-      if (parsed) {
-        setMetadata(parsed);
+    let isMounted = true;
+
+    const loadMetadata = async (uri) => {
+      if (!uri) return;
+      const inline = parseTokenURI(uri);
+      if (inline) {
+        if (isMounted) setMetadata(inline);
         return;
       }
-    }
+      try {
+        const resolvedUrl = resolveIPFS(uri);
+        const res = await fetch(resolvedUrl);
+        const json = await res.json();
+        if (json.image) json.image = resolveIPFS(json.image);
+        if (isMounted) setMetadata(json);
+      } catch (err) {
+        console.error('Failed to fetch remote metadata:', err);
+      }
+    };
 
-    if (tokenId && !initialURI) {
-      let isMounted = true;
+    if (initialURI) {
+      loadMetadata(initialURI);
+    } else if (tokenId) {
       const fetchURI = async () => {
         try {
           const provider = new JsonRpcProvider(RPC_URL);
           const contract = new Contract(CONTRACT_ADDRESSES.RWA_TOKEN, RWATokenABI, provider);
           const uri = await contract.tokenURI(tokenId);
-          const parsed = parseTokenURI(uri);
-          if (isMounted && parsed) {
-            setMetadata(parsed);
-          }
-        } catch {
-          // Fallback to gradient icon
-        }
+          loadMetadata(uri);
+        } catch {}
       };
       fetchURI();
-      return () => { isMounted = false; };
     }
+
+    return () => { isMounted = false; };
   }, [tokenId, initialURI]);
 
   const hasValidImage = metadata?.image && !imageError;
