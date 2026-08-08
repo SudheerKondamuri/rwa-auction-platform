@@ -8,15 +8,9 @@ import { formatEth, truncateAddress, formatDate, generateGradient, formatErrorMe
 import CountdownTimer from '../components/CountdownTimer';
 import BidPanel from '../components/BidPanel';
 import DutchBuyPanel from '../components/DutchBuyPanel';
-import { Building2, Home, Landmark, Gem, Paintbrush, ArrowLeft, ShieldAlert, Sparkles, CheckCircle2, User, Clock, Calendar, Coins } from 'lucide-react';
+import AssetVisual from '../components/AssetVisual';
+import { ArrowLeft, ShieldAlert, Sparkles, CheckCircle2, User, Clock, Calendar, Coins } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-function NFTIcon({ tokenId, className = "w-24 h-24 text-white" }) {
-  const id = Number(tokenId);
-  const icons = [Building2, Home, Landmark, Gem, Paintbrush];
-  const IconComponent = icons[id % icons.length];
-  return <IconComponent className={className} />;
-}
 
 export default function AuctionDetail() {
   const { id } = useParams();
@@ -106,16 +100,8 @@ export default function AuctionDetail() {
 
       <div className="grid md:grid-cols-2 gap-12 items-start">
         {/* Left: NFT Display */}
-        <div
-          className="aspect-[4/3] md:aspect-square w-full flex items-center justify-center relative overflow-hidden rounded-3xl border border-white/10 shadow-glow"
-          style={{ background: generateGradient(auction.tokenId) }}
-        >
-          <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
-          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:24px_24px]" />
-          
-          <div className="w-32 h-32 rounded-[40px] bg-black/25 backdrop-blur-md flex items-center justify-center border border-white/10 shadow-xl">
-            <NFTIcon tokenId={auction.tokenId} />
-          </div>
+        <div className="aspect-[4/3] md:aspect-square w-full relative overflow-hidden rounded-3xl border border-white/10 shadow-glow">
+          <AssetVisual tokenId={auction.tokenId} className="w-full h-full" />
         </div>
 
         {/* Right: Info Panel */}
