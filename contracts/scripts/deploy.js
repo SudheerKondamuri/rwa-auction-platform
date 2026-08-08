@@ -29,6 +29,8 @@ async function main() {
     "https://example.com/metadata/1",
     "https://example.com/metadata/2",
     "https://example.com/metadata/3",
+    "https://example.com/metadata/4",
+    "https://example.com/metadata/5",
   ];
 
   for (let i = 0; i < sampleURIs.length; i++) {
@@ -36,6 +38,46 @@ async function main() {
     await tx.wait();
     console.log(`Minted NFT #${i + 1} with URI: ${sampleURIs[i]}`);
   }
+
+  // Create sample active auctions for the first 3 NFTs
+  console.log("\n--- Creating sample auctions ---");
+
+  // Approve AuctionHouse for Tokens 1, 2, and 3
+  for (let tokenId = 1; tokenId <= 3; tokenId++) {
+    const approveTx = await rwaToken.approve(auctionHouseAddress, tokenId);
+    await approveTx.wait();
+  }
+
+  // Auction 1: English Auction for Token #1
+  const ethTx1 = await auctionHouse.createEnglishAuction(
+    rwaTokenAddress,
+    1,
+    hre.ethers.parseEther("1.5"),
+    86400 * 7
+  );
+  await ethTx1.wait();
+  console.log("Created English Auction for Token #1 (1.5 ETH starting bid)");
+
+  // Auction 2: English Auction for Token #2
+  const ethTx2 = await auctionHouse.createEnglishAuction(
+    rwaTokenAddress,
+    2,
+    hre.ethers.parseEther("2.8"),
+    86400 * 5
+  );
+  await ethTx2.wait();
+  console.log("Created English Auction for Token #2 (2.8 ETH starting bid)");
+
+  // Auction 3: Dutch Auction for Token #3
+  const dutchTx = await auctionHouse.createDutchAuction(
+    rwaTokenAddress,
+    3,
+    hre.ethers.parseEther("10.0"),
+    hre.ethers.parseEther("2.0"),
+    86400 * 3
+  );
+  await dutchTx.wait();
+  console.log("Created Dutch Auction for Token #3 (10.0 ETH starting, 2.0 ETH floor)");
 
   // Write submission.json
   const submission = {
