@@ -3,7 +3,7 @@ import { parseEther } from 'ethers';
 import toast from 'react-hot-toast';
 import { useWalletStore } from '../stores/walletStore';
 import { useAuctionStore } from '../stores/auctionStore';
-import { formatEth } from '../utils/formatters';
+import { formatEth, formatErrorMessage } from '../utils/formatters';
 import { Gavel, TrendingUp, Info } from 'lucide-react';
 
 export default function BidPanel({ auction }) {
@@ -32,8 +32,7 @@ export default function BidPanel({ auction }) {
       toast.success('Bid placed successfully!');
       setBidAmount('');
     } catch (error) {
-      const msg = error?.reason || error?.message || 'Transaction failed';
-      toast.error(msg);
+      toast.error(formatErrorMessage(error));
     } finally {
       setLoading(false);
     }
