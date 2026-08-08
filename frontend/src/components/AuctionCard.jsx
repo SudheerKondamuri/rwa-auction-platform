@@ -1,15 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { formatEth, truncateAddress, generateGradient } from '../utils/formatters';
+import { formatEth, truncateAddress } from '../utils/formatters';
 import CountdownTimer from './CountdownTimer';
-import { Building2, Home, Landmark, Gem, Paintbrush, ArrowRight, User } from 'lucide-react';
+import AssetVisual from './AssetVisual';
+import { ArrowRight, User } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-function NFTIcon({ tokenId, className = "w-12 h-12 text-white" }) {
-  const id = Number(tokenId);
-  const icons = [Building2, Home, Landmark, Gem, Paintbrush];
-  const IconComponent = icons[id % icons.length];
-  return <IconComponent className={className} />;
-}
 
 export default function AuctionCard({ auction }) {
   const navigate = useNavigate();
@@ -26,19 +20,9 @@ export default function AuctionCard({ auction }) {
       className="glass-card hover:glass-card-hover overflow-hidden cursor-pointer flex flex-col group h-full"
       data-test-id="auction-item"
     >
-      {/* Visual Header / RWA Artwork representation */}
-      <div
-        className="h-[180px] w-full flex items-center justify-center relative overflow-hidden transition-transform duration-500 group-hover:scale-[1.02]"
-        style={{ background: generateGradient(auction.tokenId) }}
-      >
-        <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
-        {/* Subtle grid pattern background */}
-        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-        
-        {/* Icon wrapper */}
-        <div className="w-20 h-20 rounded-3xl bg-black/20 backdrop-blur-md flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-          <NFTIcon tokenId={auction.tokenId} />
-        </div>
+      {/* Visual Header / Asset Image */}
+      <div className="h-[200px] w-full relative overflow-hidden">
+        <AssetVisual tokenId={auction.tokenId} className="w-full h-full" />
       </div>
 
       <div className="p-6 flex flex-col flex-1 gap-6">
