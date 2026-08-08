@@ -48,16 +48,29 @@ export function formatDate(timestamp) {
   });
 }
 
+export function resolveIPFS(url) {
+  if (!url) return '';
+  if (url.startsWith('ipfs://')) {
+    const path = url.replace('ipfs://', '');
+    return `https://ipfs.io/ipfs/${path}`;
+  }
+  return url;
+}
+
 export function parseTokenURI(tokenURI) {
   if (!tokenURI) return null;
   try {
     if (tokenURI.startsWith('data:application/json;base64,')) {
       const base64Str = tokenURI.split('data:application/json;base64,')[1];
       const jsonStr = atob(base64Str);
-      return JSON.parse(jsonStr);
+      const data = JSON.parse(jsonStr);
+      if (data.image) data.image = resolveIPFS(data.image);
+      return data;
     }
     if (tokenURI.startsWith('{')) {
-      return JSON.parse(tokenURI);
+      const data = JSON.parse(tokenURI);
+      if (data.image) data.image = resolveIPFS(data.image);
+      return data;
     }
   } catch (err) {
     console.error('Failed to parse tokenURI:', err);
