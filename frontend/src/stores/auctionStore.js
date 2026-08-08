@@ -21,10 +21,10 @@ export const useAuctionStore = create((set, get) => ({
       const activeIds = await contract.getActiveAuctions();
       const idNumbers = activeIds.map((id) => Number(id));
 
-      const auctionMap = {};
+      const updatedAuctions = { ...get().auctions };
       for (const id of idNumbers) {
         const a = await contract.getAuction(id);
-        auctionMap[id] = {
+        updatedAuctions[id] = {
           auctionId: Number(a.auctionId),
           auctionType: Number(a.auctionType),
           status: Number(a.status),
@@ -40,7 +40,7 @@ export const useAuctionStore = create((set, get) => ({
         };
       }
 
-      set({ auctions: auctionMap, activeAuctionIds: idNumbers, loading: false });
+      set({ auctions: updatedAuctions, activeAuctionIds: idNumbers, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
     }
@@ -86,6 +86,7 @@ export const useAuctionStore = create((set, get) => ({
     const contract = new Contract(CONTRACT_ADDRESSES.AUCTION_HOUSE, AuctionHouseABI, signer);
     const tx = await contract.finalizeAuction(auctionId);
     await tx.wait();
+    await get().fetchSingleAuction(auctionId);
     await get().fetchAuctions();
     return tx;
   },
@@ -94,6 +95,7 @@ export const useAuctionStore = create((set, get) => ({
     const contract = new Contract(CONTRACT_ADDRESSES.AUCTION_HOUSE, AuctionHouseABI, signer);
     const tx = await contract.buyFromDutchAuction(auctionId, { value: price });
     await tx.wait();
+    await get().fetchSingleAuction(auctionId);
     await get().fetchAuctions();
     return tx;
   },
@@ -102,6 +104,7 @@ export const useAuctionStore = create((set, get) => ({
     const contract = new Contract(CONTRACT_ADDRESSES.AUCTION_HOUSE, AuctionHouseABI, signer);
     const tx = await contract.cancelAuction(auctionId);
     await tx.wait();
+    await get().fetchSingleAuction(auctionId);
     await get().fetchAuctions();
     return tx;
   },
