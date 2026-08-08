@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useWalletStore } from '../stores/walletStore';
 import { useNFTStore } from '../stores/nftStore';
 import { CONTRACT_ADDRESSES } from '../utils/contractAddresses';
-import { generateGradient } from '../utils/formatters';
+import { generateGradient, formatErrorMessage } from '../utils/formatters';
 import { Building2, Home, Landmark, Gem, Paintbrush, ArrowLeft, Check, Key, Gavel, TrendingDown, Hourglass } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -23,10 +23,10 @@ export default function CreateAuction() {
   const { approveForAuction } = useNFTStore();
 
   const [auctionType, setAuctionType] = useState('english');
-  const [startingBid, setStartingBid] = useState('');
-  const [startPrice, setStartPrice] = useState('');
-  const [endPrice, setEndPrice] = useState('');
-  const [duration, setDuration] = useState('24');
+  const [startingBid, setStartingBid] = useState('0.1');
+  const [startPrice, setStartPrice] = useState('1.0');
+  const [endPrice, setEndPrice] = useState('0.1');
+  const [duration, setDuration] = useState('24'); // hours
   const [step, setStep] = useState(1); // 1 = approve, 2 = create
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +38,7 @@ export default function CreateAuction() {
       toast.success('NFT approved for auction!');
       setStep(2);
     } catch (error) {
-      toast.error(error?.reason || error?.message || 'Approval failed');
+      toast.error(formatErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ export default function CreateAuction() {
       toast.success('Auction created successfully!');
       navigate('/auctions');
     } catch (error) {
-      toast.error(error?.reason || error?.message || 'Creation failed');
+      toast.error(formatErrorMessage(error));
     } finally {
       setLoading(false);
     }
