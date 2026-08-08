@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuctionStore } from '../stores/auctionStore';
 import { useWalletStore } from '../stores/walletStore';
-import { formatEth, truncateAddress, formatDate, generateGradient } from '../utils/formatters';
+import { formatEth, truncateAddress, formatDate, generateGradient, formatErrorMessage } from '../utils/formatters';
 import CountdownTimer from '../components/CountdownTimer';
 import BidPanel from '../components/BidPanel';
 import DutchBuyPanel from '../components/DutchBuyPanel';
@@ -44,7 +44,7 @@ export default function AuctionDetail() {
       await finalizeAuction(signer, Number(id));
       toast.success('Auction finalized!');
     } catch (error) {
-      toast.error(error?.reason || error?.message || 'Failed');
+      toast.error(formatErrorMessage(error));
     } finally {
       setFinalizing(false);
     }
