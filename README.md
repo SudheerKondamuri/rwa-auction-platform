@@ -1,6 +1,6 @@
 # RWA Auction Platform
 
-A production-grade decentralized application (dApp) for auctioning tokenized Real-World Assets (RWAs) built with Solidity, Hardhat, React, and ethers.js.
+A decentralized application (dApp) for auctioning tokenized Real-World Assets (RWAs) built with Solidity, Hardhat, React, and ethers.js.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Solidity](https://img.shields.io/badge/Solidity-^0.8.20-363636)
@@ -15,10 +15,11 @@ The platform consists of two main components:
 - **AuctionHouse.sol**: Auction management contract supporting English and Dutch auctions
 
 ### Frontend (React + Vite)
-- Premium 3D landing page with glassmorphism design
+- Modern landing page with animated particles and gradient effects
 - Multi-screen dApp with real-time blockchain state management
 - MetaMask wallet integration via ethers.js v6
 - Zustand for state management with optimistic updates
+- Responsive glassmorphic UI components with smooth transitions
 
 ## Quick Start
 
