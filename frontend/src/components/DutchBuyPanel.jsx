@@ -3,6 +3,7 @@ import { Contract, JsonRpcProvider } from 'ethers';
 import toast from 'react-hot-toast';
 import { useWalletStore } from '../stores/walletStore';
 import { useAuctionStore } from '../stores/auctionStore';
+import { useNFTStore } from '../stores/nftStore';
 import { CONTRACT_ADDRESSES, RPC_URL } from '../utils/contractAddresses';
 import AuctionHouseABI from '../utils/abis/AuctionHouse.json';
 import { formatEth, formatErrorMessage } from '../utils/formatters';
@@ -58,7 +59,8 @@ export default function DutchBuyPanel({ auction }) {
       // Add 1% buffer for price movement during tx
       const bufferPrice = currentPrice + (currentPrice / 100n);
       await buyFromDutchAuction(signer, auction.auctionId, bufferPrice);
-      toast.success('Purchase successful!');
+      toast.success('Purchase successful! Asset added to your collection.');
+      useNFTStore.getState().fetchMyNFTs(account);
     } catch (error) {
       toast.error(formatErrorMessage(error));
     } finally {
