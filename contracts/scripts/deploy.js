@@ -23,20 +23,58 @@ async function main() {
   const auctionHouseAddress = await auctionHouse.getAddress();
   console.log("AuctionHouse deployed to:", auctionHouseAddress);
 
-  // Mint sample NFTs
+  // Mint sample NFTs with high-resolution Unsplash images & base64 metadata
   console.log("\n--- Minting sample NFTs ---");
-  const sampleURIs = [
-    "https://example.com/metadata/1",
-    "https://example.com/metadata/2",
-    "https://example.com/metadata/3",
-    "https://example.com/metadata/4",
-    "https://example.com/metadata/5",
+  
+  function makeMetadata(name, description, image, category) {
+    const json = JSON.stringify({
+      name,
+      description,
+      image,
+      attributes: [{ trait_type: 'Category', value: category }]
+    });
+    return `data:application/json;base64,${Buffer.from(json).toString('base64')}`;
+  }
+
+  const sampleAssets = [
+    {
+      name: "Manhattan Office Tower",
+      description: "Prime commercial skyscraper in Midtown Manhattan tokenized via ERC-721.",
+      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+      category: "real-estate"
+    },
+    {
+      name: "Beverly Hills Luxury Residence",
+      description: "Ultra-luxury 6-bedroom estate with panoramic sunset views of Los Angeles.",
+      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
+      category: "real-estate"
+    },
+    {
+      name: "Swiss Vaulted Gold Bullion (10kg)",
+      description: "Allocated 999.9 fine gold bars vaulted securely in Zurich, Switzerland.",
+      image: "https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=1200&q=80",
+      category: "commodity"
+    },
+    {
+      name: "Mayfair Commercial Hub",
+      description: "Historic retail and commercial hub located in Central London.",
+      image: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80",
+      category: "real-estate"
+    },
+    {
+      name: "Modernist Abstract Canvas #42",
+      description: "Fine art masterpiece verified with physical provenance certificate.",
+      image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1200&q=80",
+      category: "art"
+    }
   ];
 
-  for (let i = 0; i < sampleURIs.length; i++) {
-    const tx = await rwaToken.mint(deployer.address, sampleURIs[i]);
+  for (let i = 0; i < sampleAssets.length; i++) {
+    const asset = sampleAssets[i];
+    const uri = makeMetadata(asset.name, asset.description, asset.image, asset.category);
+    const tx = await rwaToken.mint(deployer.address, uri);
     await tx.wait();
-    console.log(`Minted NFT #${i + 1} with URI: ${sampleURIs[i]}`);
+    console.log(`Minted NFT #${i + 1}: ${asset.name}`);
   }
 
   // Create sample active auctions for the first 3 NFTs
