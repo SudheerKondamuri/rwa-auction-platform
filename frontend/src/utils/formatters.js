@@ -48,6 +48,23 @@ export function formatDate(timestamp) {
   });
 }
 
+export function parseTokenURI(tokenURI) {
+  if (!tokenURI) return null;
+  try {
+    if (tokenURI.startsWith('data:application/json;base64,')) {
+      const base64Str = tokenURI.split('data:application/json;base64,')[1];
+      const jsonStr = atob(base64Str);
+      return JSON.parse(jsonStr);
+    }
+    if (tokenURI.startsWith('{')) {
+      return JSON.parse(tokenURI);
+    }
+  } catch (err) {
+    console.error('Failed to parse tokenURI:', err);
+  }
+  return null;
+}
+
 export function parseEthToWei(ethString) {
   try {
     return parseEther(ethString);
